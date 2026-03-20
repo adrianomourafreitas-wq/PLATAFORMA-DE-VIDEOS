@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plataforma de Vídeos</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      min-height: 100vh;
+    }
+
+    .topo {
+      background: linear-gradient(135deg, #1d4ed8, #1e3a8a);
+      padding: 32px 20px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .topo h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .topo p {
+      color: #dbeafe;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 16px 40px;
+    }
+
+    .card {
+      background: #111827;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      margin-bottom: 24px;
+    }
+
+    h2, h3 {
+      margin-bottom: 16px;
+    }
+
+    .grid1 {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      background: #0b1220;
+      color: #ffffff;
+      outline: none;
+      font-size: 15px;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .acoes {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.2s;
+      background: #2563eb;
+      color: #ffffff;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      opacity: 0.95;
+    }
+
+    .msg {
+      margin-top: 14px;
+      color: #93c5fd;
+      word-break: break-word;
+    }
+
+    .lista-videos {
+      display: grid;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .video-card {
+      background: #0b1220;
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .video-card h4 {
+      margin-bottom: 8px;
+      color: #ffffff;
+    }
+
+    .video-card p {
+      color: #cbd5e1;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .video-card video {
+      width: 100%;
+      max-height: 380px;
+      border-radius: 12px;
+      background: #000000;
+      margin-bottom: 12px;
+    }
+
+    .video-acoes {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .video-acoes a {
+      text-decoration: none;
+      background: #1d4ed8;
+      color: #ffffff;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      display: inline-block;
+    }
+
+    .video-acoes a.sec {
+      background: #475569;
+    }
+
+    .tag-local {
+      display: inline-block;
+      background: #1e293b;
+      color: #cbd5e1;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #233047;
+      margin: 24px 0;
+    }
+
+    .vazio {
+      color: #94a3b8;
+    }
+
+    @media (max-width: 700px) {
+      .topo h1 {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topo">
+    <h1>Plataforma de Vídeos</h1>
+    <p>Upload, visualização e download de vídeos</p>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>Enviar Vídeo</h2>
+
+      <div class="grid1">
+        <input type="text" id="tituloVideo" placeholder="Título do vídeo" />
+        <textarea id="descricaoVideo" placeholder="Descrição do vídeo"></textarea>
+        <input type="file" id="arquivoVideo" accept="video/*" />
+      </div>
+
+      <div class="acoes">
+        <button id="btnUpload">Adicionar vídeo</button>
+      </div>
+
+      <p id="uploadMsg" class="msg"></p>
+
+      <hr />
+
+      <h3>Meus Vídeos</h3>
+      <div id="listaVideos" class="lista-videos"></div>
+    </section>
+  </main>
+
+  <script>
+    const tituloVideo = document.getElementById("tituloVideo");
+    const descricaoVideo = document.getElementById("descricaoVideo");
+    const arquivoVideo = document.getElementById("arquivoVideo");
+    const btnUpload = document.getElementById("btnUpload");
+    const uploadMsg = document.getElementById("uploadMsg");
+    const listaVideos = document.getElementById("listaVideos");
+
+    let videos = [];
+
+    btnUpload.addEventListener("click", function () {
+      const titulo = tituloVideo.value.trim();
+      const descricao = descricaoVideo.value.trim();
+      const file = arquivoVideo.files[0];
+
+      if (!titulo) {
+        uploadMsg.textContent = "Informe o título do vídeo.";
+        return;
+      }
+
+      if (!file) {
+        uploadMsg.textContent = "Selecione um vídeo.";
+        return;
+      }
+
+      const urlVideo = URL.createObjectURL(file);
+
+      const novoVideo = {
+        id: Date.now(),
+        titulo: titulo,
+        descricao: descricao || "Sem descrição",
+        nomeArquivo: file.name,
+        url: urlVideo
+      };
+
+      videos.unshift(novoVideo);
+
+      tituloVideo.value = "";
+      descricaoVideo.value = "";
+      arquivoVideo.value = "";
+      uploadMsg.textContent = "Vídeo adicionado com sucesso.";
+
+      renderizarVideos();
+    });
+
+    function renderizarVideos() {
+      if (videos.length === 0) {
+        listaVideos.innerHTML = '<p class="vazio">Nenhum vídeo adicionado ainda.</p>';
+        return;
+      }
+
+      let html = "";
+
+      videos.forEach(function (video) {
+        html += `
+          <div class="video-card">
+            <span class="tag-local">Vídeo local</span>
+            <h4>${escapeHtml(video.titulo)}</h4>
+            <p>${escapeHtml(video.descricao)}</p>
+
+            <video controls preload="metadata">
+              <source src="${video.url}" type="video/mp4">
+              Seu navegador não suporta vídeo.
+            </video>
+
+            <div class="video-acoes">
+              <a href="${video.url}" target="_blank">Abrir</a>
+              <a href="${video.url}" download="${escapeAttribute(video.nomeArquivo)}" class="sec">Baixar</a>
+            </div>
+          </div>
+        `;
+      });
+
+      listaVideos.innerHTML = html;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function escapeAttribute(text) {
+      return String(text).replace(/"/g, "&quot;");
+    }
+
+    renderizarVideos();
+  </script>
+</body>
+</html>
